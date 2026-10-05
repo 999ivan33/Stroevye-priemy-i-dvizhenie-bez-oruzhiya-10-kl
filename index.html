@@ -1,0 +1,1172 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Строевая подготовка: Контрольный рубеж</title>
+  <style>
+    /* =========================================================
+       1. СБРОС И БАЗОВЫЙ АНТИКОПИРОВАЛЬНЫЙ КОНТУР (ANTI-COPY)
+       ========================================================= */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none !important;
+      -webkit-user-select: none !important;
+      -moz-user-select: none !important;
+      -ms-user-select: none !important;
+      -webkit-touch-callout: none !important;
+      touch-action: manipulation;
+    }
+
+    body {
+      background-color: #07090e;
+      color: #e2e8f0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      min-height: 100vh;
+      min-height: -webkit-fill-available;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: calc(env(safe-area-inset-top) + 12px) 12px calc(env(safe-area-inset-bottom) + 12px);
+      overflow-x: hidden;
+    }
+
+    /* Тактический фоновый паттерн */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background: 
+        radial-gradient(circle at 50% 12%, rgba(255, 87, 34, 0.09), transparent 65%),
+        linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+      background-size: 100% 100%, 24px 24px, 24px 24px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* =========================================================
+       2. МОБИЛЬНЫЙ КОНТЕЙНЕР И СТРУКТУРА
+       ========================================================= */
+    .app-card {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 580px;
+      background: #0f141f;
+      border: 1px solid #1e293b;
+      border-radius: 14px;
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.7);
+      padding: 18px 16px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .top-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #1e293b;
+    }
+
+    .badge-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: rgba(255, 87, 34, 0.12);
+      color: #ff9800;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 3px 8px;
+      border-radius: 6px;
+      border: 1px solid rgba(255, 87, 34, 0.3);
+    }
+
+    .counter-text {
+      font-size: 12px;
+      font-weight: 600;
+      color: #94a3b8;
+    }
+
+    .progress-bar-bg {
+      width: 100%;
+      height: 5px;
+      background: #172033;
+      border-radius: 99px;
+      margin-bottom: 16px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #ff5722, #ff9800);
+      transition: width 0.25s ease;
+    }
+
+    /* =========================================================
+       3. TIMED REVEAL (АНТИСКРИНШОТ И РАЗМЫТИЕ)
+       ========================================================= */
+    .question-zone {
+      position: relative;
+      min-height: 240px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .protected-box {
+      transition: filter 0.2s ease, opacity 0.2s ease;
+    }
+
+    .protected-box.blurred {
+      filter: blur(14px);
+      opacity: 0.2;
+      pointer-events: none;
+    }
+
+    .protected-box.active-view {
+      filter: blur(0);
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .question-heading {
+      font-size: 15.5px;
+      font-weight: 600;
+      line-height: 1.45;
+      color: #f8fafc;
+      margin-bottom: 14px;
+    }
+
+    .options-list {
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+    }
+
+    .option-item {
+      background: #151c2c;
+      border: 1px solid #222f48;
+      border-radius: 9px;
+      padding: 12px 14px;
+      font-size: 13.5px;
+      line-height: 1.35;
+      color: #cbd5e1;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: background 0.15s ease, border-color 0.15s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .option-item:active {
+      background: #1e2b45;
+      border-color: #ff5722;
+    }
+
+    .option-letter {
+      width: 22px;
+      height: 22px;
+      border-radius: 5px;
+      background: #222f48;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      color: #94a3b8;
+      flex-shrink: 0;
+    }
+
+    /* Панель таймера просмотра */
+    .view-control-panel {
+      margin-top: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .btn-view {
+      width: 100%;
+      background: #ff5722;
+      color: #ffffff;
+      border: none;
+      border-radius: 9px;
+      padding: 13px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      box-shadow: 0 4px 12px rgba(255, 87, 34, 0.35);
+      transition: background 0.15s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .btn-view:active {
+      background: #f4511e;
+    }
+
+    .btn-view:disabled {
+      background: #242f44;
+      color: #64748b;
+      box-shadow: none;
+      cursor: not-allowed;
+    }
+
+    .countdown-bar-box {
+      width: 100%;
+      height: 4px;
+      background: #172033;
+      border-radius: 99px;
+      overflow: hidden;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+
+    .countdown-bar-box.visible {
+      opacity: 1;
+    }
+
+    .countdown-bar-value {
+      height: 100%;
+      width: 100%;
+      background: #ff9800;
+    }
+
+    /* =========================================================
+       4. ЭКРАНЫ ИТОГОВ И ДИСКВАЛИФИКАЦИИ
+       ========================================================= */
+    .screen-view {
+      display: none;
+    }
+
+    .screen-view.current {
+      display: block;
+    }
+
+    .result-content {
+      text-align: center;
+      padding: 12px 4px;
+    }
+
+    .mark-circle {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      margin: 0 auto 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 34px;
+      font-weight: 800;
+      border: 3px solid;
+    }
+
+    .mark-5 { color: #4ade80; border-color: #4ade80; background: rgba(74, 222, 128, 0.12); }
+    .mark-4 { color: #60a5fa; border-color: #60a5fa; background: rgba(96, 165, 250, 0.12); }
+    .mark-3 { color: #facc15; border-color: #facc15; background: rgba(250, 204, 21, 0.12); }
+    .mark-2 { color: #f87171; border-color: #f87171; background: rgba(248, 113, 113, 0.12); }
+
+    .score-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #f8fafc;
+      margin-bottom: 4px;
+    }
+
+    .score-percent {
+      font-size: 13px;
+      color: #94a3b8;
+      margin-bottom: 14px;
+    }
+
+    .analysis-card {
+      background: #151c2c;
+      border: 1px solid #222f48;
+      border-radius: 9px;
+      padding: 13px;
+      text-align: left;
+      font-size: 13px;
+      line-height: 1.45;
+      color: #cbd5e1;
+      margin-bottom: 16px;
+    }
+
+    .action-btn {
+      background: #2563eb;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      font-size: 13.5px;
+      font-weight: 600;
+      border-radius: 8px;
+      cursor: pointer;
+      width: 100%;
+    }
+
+    /* Экран перехвата (Kick) */
+    .kick-content {
+      text-align: center;
+      padding: 24px 8px;
+    }
+
+    .kick-sym {
+      font-size: 46px;
+      margin-bottom: 12px;
+    }
+
+    .kick-alert {
+      font-size: 17px;
+      font-weight: 800;
+      color: #ef4444;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    .kick-info {
+      font-size: 13px;
+      color: #cbd5e1;
+      line-height: 1.45;
+      margin-bottom: 18px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-card">
+
+  <!-- ЭКРАН ТЕСТА -->
+  <div id="test-screen" class="screen-view current">
+    <div class="top-meta">
+      <span class="badge-label">🎖️ СТРОЕВАЯ ПОДГОТОВКА</span>
+      <span id="q-counter" class="counter-text">Вопрос 1 из 15</span>
+    </div>
+
+    <div class="progress-bar-bg">
+      <div id="p-bar" class="progress-bar-fill"></div>
+    </div>
+
+    <div class="question-zone">
+      <div id="protected-wrap" class="protected-box blurred">
+        <h2 id="q-text" class="question-heading">Загрузка задания...</h2>
+        <div id="options-box" class="options-list"></div>
+      </div>
+    </div>
+
+    <div class="view-control-panel">
+      <div id="timer-line-box" class="countdown-bar-box">
+        <div id="timer-line-fill" class="countdown-bar-value"></div>
+      </div>
+      <button id="btn-reveal" class="btn-view">
+        <span>👁️ Показать вопрос (6 сек)</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ЭКРАН РЕЗУЛЬТАТОВ -->
+  <div id="result-screen" class="screen-view">
+    <div class="result-content">
+      <div id="mark-circle" class="mark-circle">5</div>
+      <div id="score-text" class="score-title">15 из 15 верно</div>
+      <div id="percent-text" class="score-percent">100% правильных ответов</div>
+
+      <div class="analysis-card">
+        <strong>Заключение методиста:</strong>
+        <p id="analysis-text" style="margin-top: 5px;"></p>
+      </div>
+
+      <button class="action-btn" onclick="location.reload()">Пройти еще раз</button>
+    </div>
+  </div>
+
+  <!-- ЭКРАН СБРОСА / ДИСКВАЛИФИКАЦИИ -->
+  <div id="kick-screen" class="screen-view">
+    <div class="kick-content">
+      <div class="kick-sym">🚫</div>
+      <div class="kick-alert">Тест аннулирован!</div>
+      <div class="kick-info">
+        Зафиксирована потеря фокуса экрана, свайп панели уведомлений, переключение вкладки или попытка создания скриншота.<br><br>
+        <strong>Оценка: 2 (0 баллов).</strong> Попытка заблокирована защитным протоколом честности.
+      </div>
+      <button class="action-btn" style="background: #dc2626;" onclick="location.reload()">Начать сначала</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* =========================================================
+   БАНК ИЗ 60 ВОПРОСОВ ПО СТРОЕВОЙ ПОДГОТОВКЕ (8-10 КЛАСС)
+   ВАРИАНТЫ В КАЖДОМ ВОПРОСЕ ВЫВЕРЕНЫ ПО ДЛИНЕ СТРОКИ
+   ========================================================= */
+const questionBank = [
+  {
+    q: "Под каким нормативным углом разводятся носки при строевой стойке?",
+    a: [
+      "Разводятся ровно на 60 градусов",
+      "Разводятся ровно на 45 градусов",
+      "Разводятся ровно на 90 градусов",
+      "Ставятся параллельно по фронту"
+    ]
+  },
+  {
+    q: "Как правильно распределяется вес тела человека в строевой стойке?",
+    a: [
+      "Подается на переднюю треть стоп",
+      "Переносится полностью на пятки",
+      "Фиксируется строго на коленях",
+      "Распределяется на левую сторону"
+    ]
+  },
+  {
+    q: "Где должны находиться кисти рук военнослужащего по стойке «Смирно»?",
+    a: [
+      "Прижаты у среднего шва брюк",
+      "Сжаты в кулаки перед поясом",
+      "Свободно свисают перед телом",
+      "Удерживаются строго на поясе"
+    ]
+  },
+  {
+    q: "Как следует держать пальцы кистей при правильной строевой стойке?",
+    a: [
+      "Полусогнутыми у бедер сбоку",
+      "Вытянутыми вдоль линии бедер",
+      "Плотно сжатыми в кулак книзу",
+      "Свободно расслабленными вниз"
+    ]
+  },
+  {
+    q: "Что разрешается делать учащемуся по уставной команде «Вольно»?",
+    a: [
+      "Ослабить в колене одну ногу",
+      "Сходить со своего места в строю",
+      "Разговаривать шепотом с соседом",
+      "Поворачиваться спиной к строю"
+    ]
+  },
+  {
+    q: "Какое главное требование сохраняется при команде «Вольно» на месте?",
+    a: [
+      "Не сходить с места и молчать",
+      "Держать руки строго по швам",
+      "Обязательно смотреть направо",
+      "Приподнимать носок правой ноги"
+    ]
+  },
+  {
+    q: "Что необходимо сделать перед выполнением команды «Заправиться»?",
+    a: [
+      "Получить команду «Вольно» в строю",
+      "Самостоятельно выйти из строя",
+      "Громко доложить командиру взвода",
+      "Сделать поворот на правый фланг"
+    ]
+  },
+  {
+    q: "На какие две обязательные части делится большинство строевых команд?",
+    a: [
+      "Предварительная и исполнительная",
+      "Пояснительная и заключительная",
+      "Подготовительная и оперативная",
+      "Направляющая и вспомогательная"
+    ]
+  },
+  {
+    q: "В какой момент подается и выполняется исполнительная команда строя?",
+    a: [
+      "Громко, отрывисто и немедленно",
+      "Тихо, протяжно и с паузой в шаг",
+      "Повторяется дважды для контроля",
+      "Только после взмаха руки старшего"
+    ]
+  },
+  {
+    q: "На каких точках стоп выполняется уставной поворот «Напра-во»?",
+    a: [
+      "На правом каблуке и левом носке",
+      "На левом каблуке и правом носке",
+      "На двух носках обеих ног вместе",
+      "На двух пятках без отрыва носков"
+    ]
+  },
+  {
+    q: "На каких точках стоп выполняется поворот на месте «Нале-во»?",
+    a: [
+      "На левом каблуке и правом носке",
+      "На правом каблуке и левом носке",
+      "На двух носках одновременно стоя",
+      "На двух пятках одновременно стоя"
+    ]
+  },
+  {
+    q: "Через какое плечо всегда производится поворот на месте «Круг-ом»?",
+    a: [
+      "Только через левое плечо назад",
+      "Только через правое плечо назад",
+      "В любую сторону по выбору бойца",
+      "По кратчайшей траектории назад"
+    ]
+  },
+  {
+    q: "На сколько градусов разворачивается корпус по команде «Круг-ом»?",
+    a: [
+      "Ровно на 180 градусов кругом",
+      "Ровно на 360 градусов кругом",
+      "Ровно на 90 градусов в сторону",
+      "Ровно на 270 градусов по дуге"
+    ]
+  },
+  {
+    q: "На сколько темпов (счетов) раскладываются повороты на месте в обучении?",
+    a: [
+      "Выполняются строго на два счета",
+      "Выполняются строго на три счета",
+      "Выполняются строго на четыре счета",
+      "Выполняются на один длинный счет"
+    ]
+  },
+  {
+    q: "Что делает военнослужащий на второй счет любого поворота на месте?",
+    a: [
+      "Кратчайшим путем ставит ногу",
+      "Делает резкий хлопок ладонью",
+      "Опускает подбородок к груди",
+      "Ослабляет колено левой ноги"
+    ]
+  },
+  {
+    q: "На какую нормативную высоту поднимается нога при строевом шаге?",
+    a: [
+      "На 15–20 сантиметров от земли",
+      "На 30–35 сантиметров от земли",
+      "На 5–10 сантиметров от земли",
+      "Строго на уровень колена стойки"
+    ]
+  },
+  {
+    q: "Как должен быть направлен носок выносимой ноги при строевом шаге?",
+    a: [
+      "Вытянут вперед и книзу к земле",
+      "Поднят строго вверх на себя",
+      "Развернут наружу под прямым углом",
+      "Расслаблен в свободном падении"
+    ]
+  },
+  {
+    q: "Какова нормативная длина уставного строевого шага военнослужащего?",
+    a: [
+      "Составляет от 70 до 80 сантиметров",
+      "Составляет от 50 до 60 сантиметров",
+      "Составляет от 90 до 100 сантиметров",
+      "Составляет от 40 до 50 сантиметров"
+    ]
+  },
+  {
+    q: "Каков нормативный темп движения при выполнении строевого шага?",
+    a: [
+      "От 110 до 120 шагов за минуту",
+      "От 80 до 90 шагов за минуту",
+      "От 130 до 140 шагов за минуту",
+      "От 95 до 105 шагов за минуту"
+    ]
+  },
+  {
+    q: "Как правильно ставится стопа на землю при движении строевым шагом?",
+    a: [
+      "Твердо на всю подошву сразу",
+      "Мягким перекатом с носка назад",
+      "Резким ударом каблука вперед",
+      "Сначала на внешний край стопы"
+    ]
+  },
+  {
+    q: "На какую высоту поднимается рука вперед при движении строевым шагом?",
+    a: [
+      "Выше пояса на ширину ладони",
+      "Строго до линии глаз по фронту",
+      "Строго до уровня середины груди",
+      "До прямого угла в плечевом суставе"
+    ]
+  },
+  {
+    q: "Как далеко отводится прямая рука назад при строевом шаге?",
+    a: [
+      "Отводится назад до полного отказа",
+      "Отводится назад на ширину ладони",
+      "Фиксируется неподвижно у пояса",
+      "Сгибается в локте на прямой угол"
+    ]
+  },
+  {
+    q: "Чем походный шаг принципиально отличается от уставного строевого шага?",
+    a: [
+      "Нога выносится свободно вперед",
+      "Темп снижается до минимума в шаг",
+      "Руки держатся неподвижно по швам",
+      "Корпус наклоняется резко вперед"
+    ]
+  },
+  {
+    q: "Какая команда подается для перехода со строевого шага на походный?",
+    a: [
+      "Подается команда «Строем — пошел!»",
+      "Подается команда «Шагом — марш!»",
+      "Подается команда «Прямо — марш!»",
+      "Подается команда «Строевой — стой!»"
+    ]
+  },
+  {
+    q: "Какая команда подается для перехода с походного шага на строевой?",
+    a: [
+      "Подается команда «Строевым — марш!»",
+      "Подается команда «Шире шаг — марш!»",
+      "Подается команда «Внимание — прямо!»",
+      "Подается команда «Бегом — вперед!»"
+    ]
+  },
+  {
+    q: "С какой ноги всегда начинается движение по команде «Шагом — марш»?",
+    a: [
+      "Всегда строго с левой ноги",
+      "Всегда строго с правой ноги",
+      "С любой ноги по выбору строя",
+      "С ноги, указанной командиром"
+    ]
+  },
+  {
+    q: "Под какую ногу подается исполнительная команда «Напра-во» в движении?",
+    a: [
+      "Подается под правую ногу бойца",
+      "Подается под левую ногу бойца",
+      "Подается в момент смыкания ног",
+      "Подается независимо от шага ног"
+    ]
+  },
+  {
+    q: "Под какую ногу подается исполнительная команда «Нале-во» в движении?",
+    a: [
+      "Подается под левую ногу бойца",
+      "Подается под правую ногу бойца",
+      "Подается в момент остановки ноги",
+      "Подается строго под правую руку"
+    ]
+  },
+  {
+    q: "Сколько шагов вперед делается после исполнительной команды «Стой»?",
+    a: [
+      "Делается еще один полный шаг",
+      "Делается еще два полных шага",
+      "Остановка делается немедленно",
+      "Делается три замедленных шага"
+    ]
+  },
+  {
+    q: "Какой жест выполняет военный при воинском приветствии без оружия?",
+    a: [
+      "Правую руку к головному убору",
+      "Левую руку к груди по центру",
+      "Делает поклон головой вперед",
+      "Опускает обе руки строго по швам"
+    ]
+  },
+  {
+    q: "Как расположены пальцы правой руки при уставном воинском приветствии?",
+    a: [
+      "Соединены вместе и выпрямлены",
+      "Собраны полукругом к козырьку",
+      "Сжаты в плотный крепкий кулак",
+      "Растопырены параллельно полу"
+    ]
+  },
+  {
+    q: "Каким пальцем кисть касается головного убора при приветствии?",
+    a: [
+      "Средним пальцем у козырька",
+      "Большим пальцем у виска сбоку",
+      "Указательным пальцем с краю",
+      "Мизинцем у края головного убора"
+    ]
+  },
+  {
+    q: "Что обязан сделать военнослужащий, услышав свою фамилию в строю?",
+    a: [
+      "Громко и четко ответить: «Я!»",
+      "Немедленно выйти вперед строя",
+      "Приложить руку к головному убору",
+      "Повернуться лицом к командиру"
+    ]
+  },
+  {
+    q: "Какой ответ дает боец при получении приказа выйти из строя?",
+    a: [
+      "Отвечает командиру: «Есть!»",
+      "Отвечает командиру: «Слушаюсь!»",
+      "Отвечает командиру: «Понял!»",
+      "Молча выполняет команду строя"
+    ]
+  },
+  {
+    q: "Каким шагом осуществляется выход из строя и подход к начальнику?",
+    a: [
+      "Только образцовым строевым шагом",
+      "Обычным походным быстрым шагом",
+      "Легким спортивным бегом к цели",
+      "Короткими приставными шагами"
+    ]
+  },
+  {
+    q: "На каком расстоянии от начальника останавливается вышедший из строя?",
+    a: [
+      "На расстоянии двух-трех шагов",
+      "На расстоянии пяти-шести шагов",
+      "Вплотную к начальнику лицом",
+      "На расстоянии ровно одного шага"
+    ]
+  },
+  {
+    q: "Что делает военнослужащий сразу после остановки возле начальника?",
+    a: [
+      "Приставляет ногу и приветствует",
+      "Сразу начинает устный доклад",
+      "Делает поворот кругом к строю",
+      "Опускает глаза строго вниз"
+    ]
+  },
+  {
+    q: "Какой фразой начинается доклад учащегося о прибытии к преподавателю?",
+    a: [
+      "«Товарищ преподаватель, Иванов...»",
+      "«Я прибыл по вашему приказанию...»",
+      "«Здравия желаю, товарищ майор...»",
+      "«Рядовой Иванов на месте стоит...»"
+    ]
+  },
+  {
+    q: "Какое действие выполняет военный по команде возвращения в строй?",
+    a: [
+      "Прикладывает руку и говорит «Есть»",
+      "Сразу бежит на свое место молча",
+      "Делает поклон и строевой шаг",
+      "Поворачивается через правое плечо"
+    ]
+  },
+  {
+    q: "Через какое плечо выполняется поворот кругом при отходе от начальника?",
+    a: [
+      "Строго через свое левое плечо",
+      "Строго через свое правое плечо",
+      "По кратчайшему удобному пути",
+      "Зависит от расположения строя"
+    ]
+  },
+  {
+    q: "Как называется строй, в котором люди стоят один возле другого на линии?",
+    a: [
+      "Такой строй называют шеренгой",
+      "Такой строй называют колонной",
+      "Такой строй называют каре строя",
+      "Такой строй называют цепочкой"
+    ]
+  },
+  {
+    q: "Как называется строй, в котором люди расположены в затылок друг другу?",
+    a: [
+      "Такой строй называют колонной",
+      "Такой строй называют шеренгой",
+      "Такой строй называют флангом",
+      "Такой строй называют фронтом"
+    ]
+  },
+  {
+    q: "Как называется расстояние по фронту между военнослужащими в шеренге?",
+    a: [
+      "Это расстояние называют интервалом",
+      "Это расстояние называют дистанцией",
+      "Это расстояние называют глубиной",
+      "Это расстояние называют шириной"
+    ]
+  },
+  {
+    q: "Как называется расстояние в глубину между стоящими в колонне людьми?",
+    a: [
+      "Это расстояние называют дистанцией",
+      "Это расстояние называют интервалом",
+      "Это расстояние называют флангом",
+      "Это расстояние называют просветом"
+    ]
+  },
+  {
+    q: "Какой нормативный интервал по локтям установлен в сомкнутом строю?",
+    a: [
+      "На ширину ладони между локтями",
+      "На ширину вытянутой вперед руки",
+      "Вплотную прижавшись плечами",
+      "На расстоянии двух шагов вбок"
+    ]
+  },
+  {
+    q: "Какая сторона строя официально называется правым флангом строя?",
+    a: [
+      "Правая оконечность линии строя",
+      "Левая оконечность линии строя",
+      "Передняя часть шеренги спереди",
+      "Задняя замыкающая часть колонны"
+    ]
+  },
+  {
+    q: "Как называется сторона строя, к которой военнослужащие обращены лицом?",
+    a: [
+      "Эту сторону называют фронтом",
+      "Эту сторону называют тылом строя",
+      "Эту сторону называют флангом",
+      "Эту сторону называют дистанцией"
+    ]
+  },
+  {
+    q: "Как называется сторона строя, противоположная его фронтальной части?",
+    a: [
+      "Эту сторону называют тылом строя",
+      "Эту сторону называют флангом",
+      "Эту сторону называют интервалом",
+      "Эту сторону называют колонной"
+    ]
+  },
+  {
+    q: "Какой рукой по уставу снимается головной убор вне строя на месте?",
+    a: [
+      "Снимается только правой рукой",
+      "Снимается только левой рукой",
+      "Снимается обеими руками сразу",
+      "Снимается любой удобной рукой"
+    ]
+  },
+  {
+    q: "В какую руку переносится снятый головной убор военнослужащим?",
+    a: [
+      "В согнутую левую руку кокардой",
+      "В правую руку козырьком назад",
+      "Удерживается под мышкой сзади",
+      "Вешается на поясной ремень"
+    ]
+  },
+  {
+    q: "Как должен держаться подбородок при правильной уставной стойке?",
+    a: [
+      "Приподнят с прямым взглядом",
+      "Опущен плотно к воротнику",
+      "Повернут слегка к плечу вбок",
+      "Прижат к грудине для защиты"
+    ]
+  },
+  {
+    q: "Какая ошибка чаще всего допускается учащимися при повороте на месте?",
+    a: [
+      "Сгибание коленей и взмах рук",
+      "Слишком быстрый поворот стопы",
+      "Слишком плотное сжатие зубов",
+      "Поворот с открытыми глазами"
+    ]
+  },
+  {
+    q: "Что запрещено делать военнослужащему, находящемуся в строю «Смирно»?",
+    a: [
+      "Шевелиться, говорить и зевать",
+      "Моргать и глубоко дышать носом",
+      "Смотреть прямо перед собой",
+      "Держать сомкнутыми обе пятки"
+    ]
+  },
+  {
+    q: "Какая нога приставляется первой при завершении поворота «Напра-во»?",
+    a: [
+      "Левая нога кратчайшим путем",
+      "Правая нога по воздуху вбок",
+      "Обе ноги с легким подскоком",
+      "Нога не двигается со счета"
+    ]
+  },
+  {
+    q: "Что контролирует военнослужащий для сохранения равнения в шеренге?",
+    a: [
+      "Плечи, грудь и носки соседей",
+      "Только затылок стоящего впереди",
+      "Положение облаков над плацем",
+      "Только правую руку командира"
+    ]
+  },
+  {
+    q: "Какая команда подается для выравнивания строя по правому флангу?",
+    a: [
+      "Подается команда «Равняйсь!»",
+      "Подается команда «Смирно!»",
+      "Подается команда «Прямо стой!»",
+      "Подается команда «В одну шеренгу!»"
+    ]
+  },
+  {
+    q: "Куда поворачивают головы все военнослужащие по команде «Равняйсь»?",
+    a: [
+      "Направо, кроме правофлангового",
+      "Налево, кроме левофлангового",
+      "Опускают строго вниз на носки",
+      "Смотрят прямо в лицо сержанту"
+    ]
+  },
+  {
+    q: "Какая команда подается, чтобы вернуть головы прямо после равнения?",
+    a: [
+      "Громкая команда «Смирно!»",
+      "Короткая команда «Отставить!»",
+      "Громкая команда «Вольно!»",
+      "Плавная команда «По местам!»"
+    ]
+  },
+  {
+    q: "Что развивается у учащихся благодаря регулярной строевой подготовке?",
+    a: [
+      "Осанка, слаженность и дисциплина",
+      "Умение долго сидеть без движения",
+      "Скорость быстрого бега на лыжах",
+      "Способность громко спорить вслух"
+    ]
+  },
+  {
+    q: "Какое главное правило соблюдается при движении строем в составе взвода?",
+    a: [
+      "Синхронность шага и равнение",
+      "Максимальная скорость движения",
+      "Свободная дистанция между ротами",
+      "Поочередный взмах левой рукой"
+    ]
+  }
+];
+
+/* =========================================================
+   АЛГОРИТМ РАНДОМИЗАЦИИ (ФИШЕР — ЙЕТС)
+   ========================================================= */
+function fisherYatesShuffle(arr) {
+  const array = [...arr];
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+}
+
+// Отбираем ровно 15 случайных вопросов и перемешиваем ответы
+const sessionQuestions = fisherYatesShuffle(questionBank).slice(0, 15).map(item => {
+  const correctText = item.a[0];
+  const shuffledA = fisherYatesShuffle(item.a);
+  return {
+    q: item.q,
+    options: shuffledA,
+    correctIdx: shuffledA.indexOf(correctText)
+  };
+});
+
+/* =========================================================
+   СОСТОЯНИЕ И УПРАВЛЕНИЕ ТЕСТОМ
+   ========================================================= */
+let currentStep = 0;
+let correctCount = 0;
+let isLocked = false;
+let viewTimeout = null;
+let viewInterval = null;
+
+const testScreen = document.getElementById("test-screen");
+const resultScreen = document.getElementById("result-screen");
+const kickScreen = document.getElementById("kick-screen");
+
+const qCounter = document.getElementById("q-counter");
+const pBar = document.getElementById("p-bar");
+const qText = document.getElementById("q-text");
+const optionsBox = document.getElementById("options-box");
+const protectedWrap = document.getElementById("protected-wrap");
+const btnReveal = document.getElementById("btn-reveal");
+const timerLineBox = document.getElementById("timer-line-box");
+const timerLineFill = document.getElementById("timer-line-fill");
+
+/* Очистка и возврат к размытию */
+function resetViewState() {
+  clearTimeout(viewTimeout);
+  clearInterval(viewInterval);
+  protectedWrap.classList.remove("active-view");
+  protectedWrap.classList.add("blurred");
+  timerLineBox.classList.remove("visible");
+  timerLineFill.style.width = "100%";
+  btnReveal.disabled = false;
+}
+
+/* Нажатие кнопки 6-секундного просмотра */
+btnReveal.addEventListener("click", () => {
+  if (isLocked) return;
+
+  protectedWrap.classList.remove("blurred");
+  protectedWrap.classList.add("active-view");
+  btnReveal.disabled = true;
+  timerLineBox.classList.add("visible");
+
+  const duration = 6000;
+  const start = Date.now();
+
+  viewInterval = setInterval(() => {
+    const passed = Date.now() - start;
+    const remain = Math.max(0, 1 - (passed / duration));
+    timerLineFill.style.width = (remain * 100) + "%";
+    if (passed >= duration) {
+      clearInterval(viewInterval);
+    }
+  }, 25);
+
+  viewTimeout = setTimeout(() => {
+    resetViewState();
+  }, duration);
+});
+
+/* Отрисовка текущего вопроса */
+function loadQuestion() {
+  resetViewState();
+
+  const data = sessionQuestions[currentStep];
+  qCounter.textContent = `Вопрос ${currentStep + 1} из 15`;
+  pBar.style.width = `${(currentStep / 15) * 100}%`;
+  qText.textContent = data.q;
+
+  optionsBox.innerHTML = "";
+  const letters = ["А", "Б", "В", "Г"];
+
+  data.options.forEach((optText, index) => {
+    const card = document.createElement("div");
+    card.className = "option-item";
+    card.innerHTML = `
+      <div class="option-letter">${letters[index]}</div>
+      <div>${optText}</div>
+    `;
+    card.addEventListener("click", () => pickAnswer(index));
+    optionsBox.appendChild(card);
+  });
+}
+
+/* Обработка клика по варианту ответа */
+function pickAnswer(index) {
+  if (isLocked) return;
+
+  const data = sessionQuestions[currentStep];
+  if (index === data.correctIdx) {
+    correctCount++;
+  }
+
+  currentStep++;
+  if (currentStep < 15) {
+    loadQuestion();
+  } else {
+    finishQuiz();
+  }
+}
+
+/* Финал: подсчет результатов и выставление отметок */
+function finishQuiz() {
+  resetViewState();
+  testScreen.classList.remove("current");
+  resultScreen.classList.add("current");
+
+  const pct = Math.round((correctCount / 15) * 100);
+  document.getElementById("score-text").textContent = `${correctCount} из 15 верно`;
+  document.getElementById("percent-text").textContent = `${pct}% правильных ответов`;
+
+  const markCircle = document.getElementById("mark-circle");
+  const analysisText = document.getElementById("analysis-text");
+  markCircle.className = "mark-circle";
+
+  if (pct >= 87) {
+    // 13-15 верных: Оценка 5
+    markCircle.classList.add("mark-5");
+    markCircle.textContent = "5";
+    analysisText.innerHTML = "<strong>Отличный уровень строевой выучки!</strong> Вы превосходно знаете Строевой устав ВС РФ: биомеханику стойки, углы разворота стоп, физику поворотов на месте и строевого шага, а также алгоритм выхода из строя и подхода к начальнику.";
+  } else if (pct >= 73) {
+    // 11-12 верных: Оценка 4
+    markCircle.classList.add("mark-4");
+    markCircle.textContent = "4";
+    analysisText.innerHTML = "<strong>Хороший результат!</strong> Базовые приемы и геометрия строя усвоены уверенно. Небольшие погрешности допущены в нормативах темпа шага или тонкостях строевых команд в движении.";
+  } else if (pct >= 60) {
+    // 9-10 верных: Оценка 3
+    markCircle.classList.add("mark-3");
+    markCircle.textContent = "3";
+    analysisText.innerHTML = "<strong>Удовлетворительно.</strong> Зафиксированы базовые знания строя, но присутствует путаница в точках опоры стоп при поворотах и порядке доклада начальнику. Рекомендуется повторить конспект.";
+  } else {
+    // Менее 9 верных: Оценка 2
+    markCircle.classList.add("mark-2");
+    markCircle.textContent = "2";
+    analysisText.innerHTML = "<strong>Норматив не сдан.</strong> Допущено критическое количество ошибок в фундаментальных понятиях строевой подготовки. Требуется внимательное изучение положений Строевого устава.";
+  }
+}
+
+/* =========================================================
+   ЗАЩИТНЫЙ КОНТУР: ДИСКВАЛИФИКАЦИЯ (АНТИЧИТ / АНТИСКРИН)
+   ========================================================= */
+function executeDisqualification() {
+  if (isLocked) return;
+  if (resultScreen.classList.contains("current")) return;
+
+  isLocked = true;
+  resetViewState();
+  correctCount = 0;
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText("").catch(() => {});
+  }
+
+  testScreen.classList.remove("current");
+  resultScreen.classList.remove("current");
+  kickScreen.classList.add("current");
+}
+
+/* 1. Потеря фокуса (свайп шторки на Android/iOS, многооконность) */
+window.addEventListener("blur", executeDisqualification);
+
+/* 2. Смена вкладки или сворачивание браузера */
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden) executeDisqualification();
+});
+
+/* 3. Перехват клавиши PrintScreen и системных сочетаний */
+window.addEventListener("keyup", (e) => {
+  if (e.key === "PrintScreen") executeDisqualification();
+});
+
+window.addEventListener("keydown", (e) => {
+  if (e.key === "PrintScreen") {
+    e.preventDefault();
+    executeDisqualification();
+  }
+  if (
+    e.key === "F12" ||
+    ((e.ctrlKey || e.metaKey) && ["c", "u", "s", "p", "a"].includes(e.key.toLowerCase())) ||
+    ((e.ctrlKey || e.metaKey) && e.shiftKey && ["i", "j", "c"].includes(e.key.toLowerCase()))
+  ) {
+    e.preventDefault();
+    return false;
+  }
+});
+
+/* 4. Запрет контекстного меню и drag-событий */
+document.addEventListener("contextmenu", (e) => e.preventDefault());
+document.addEventListener("dragstart", (e) => e.preventDefault());
+
+// Запуск первой сессии
+loadQuestion();
+</script>
+</body>
+</html>
